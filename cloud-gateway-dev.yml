@@ -10,26 +10,26 @@ eureka:
       defaultZone: ${EUREKA.SERVER.HOSTNAME:http://localhost:8761/eureka}
 
 # Circuit Breaker configuration
-resilience4j:
-  circuitbreaker:
-    configs:
-      circuitBreakerProduct:
-        slidingWindowSize: 16
-        failureRateThreshold: 75
-        waitDurationInOpenState: 30s
-        permittedNumberOfCallsInHalfOpenState: 10
-        slowCallDurationThreshold: 200ms
-        slowCallRateThreshold: 50
-    instances:
-      product-cb:
-        base-config: circuitBreakerProduct
-  timelimiter:
-    configs:
-      timelimiterProduct:
-        timeoutDuration: 150ms
-    instances:
-      product-cb:
-        base-config: timelimiterProduct
+# resilience4j:
+  # circuitbreaker:
+    # configs:
+      # circuitBreakerProduct:
+        # slidingWindowSize: 16
+        # failureRateThreshold: 75
+        # waitDurationInOpenState: 30s
+        # permittedNumberOfCallsInHalfOpenState: 10
+        # slowCallDurationThreshold: 200ms
+        # slowCallRateThreshold: 50
+    # instances:
+      # product-cb:
+        # base-config: circuitBreakerProduct
+  # timelimiter:
+    # configs:
+      # timelimiterProduct:
+        # timeoutDuration: 150ms
+    # instances:
+      # product-cb:
+        # base-config: timelimiterProduct
 
 # Cloud Gateway Routes
 spring:
@@ -42,11 +42,11 @@ spring:
             - Path=/api/product-service/**
           filters:
             - StripPrefix=2
-            - name: CircuitBreaker
-              args:
-                name: product-cb
-                statusCodes: 400, 401, 403, 500, 503, 504
-                fallbackUri: forward:/api/user-service/mitocode/user
+            # - name: CircuitBreaker
+              # args:
+                # name: product-cb
+                # statusCodes: 400, 401, 403, 500, 503, 504
+                # fallbackUri: forward:/api/user-service/mitocode/user
 
 
             # - AddRequestHeader=appCallerName, ${filter.parameters.appCallerName}
@@ -63,30 +63,30 @@ spring:
           filters:
             - StripPrefix=2
 
-        - id: user-service-fallback
-          uri: lb://user-service
-          predicates:
-            - Path=/api/user-service/mitocode/user
-          filters:
-            - StripPrefix=4
+        # - id: user-service-fallback
+          # uri: lb://user-service
+          # predicates:
+            # - Path=/api/user-service/mitocode/user
+          # filters:
+            # - StripPrefix=4
 
-mitocode:
-  security:
-    # client: mitocode
-    # secret: mitocode
-    key: a8aa770ee23c18979bb6a2ef56d9db5045831190a8ce38f3c481e1e3eb70bdbb2022e3ff8cc77130112ec5be8f7fe090eb21f014e2ba4dcd4ee0c285e94ed9cf2a65e6a44e7b4abe491f59a464a1fa96e33649d201b0b63c8cb09c99829750a8
-#    key: mitocode
+# mitocode:
+  # security:
+    # # client: mitocode
+    # # secret: mitocode
+    # key: a8aa770ee23c18979bb6a2ef56d9db5045831190a8ce38f3c481e1e3eb70bdbb2022e3ff8cc77130112ec5be8f7fe090eb21f014e2ba4dcd4ee0c285e94ed9cf2a65e6a44e7b4abe491f59a464a1fa96e33649d201b0b63c8cb09c99829750a8
+# #    key: mitocode
 
-management:
-  endpoints:
-    info:
-      env:
-        enabled: true
-    web:
-      exposure:
-        # include: 'metrics, disk_space, mem, cpu, prometheus'
-        include: '*'
-        base-path: /actuator
-    tracing:
-      sampling:
-        probability: 1.0
+# management:
+  # endpoints:
+    # info:
+      # env:
+        # enabled: true
+    # web:
+      # exposure:
+        # # include: 'metrics, disk_space, mem, cpu, prometheus'
+        # include: '*'
+        # base-path: /actuator
+    # tracing:
+      # sampling:
+        # probability: 1.0
