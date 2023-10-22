@@ -1,0 +1,75 @@
+server:
+  port: ${CUSTOM.SERVER.PORT:9002}
+
+eureka:
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: ${EUREKA.SERVER.HOSTNAME:http://localhost:8761/eureka}
+
+### Mongo database configuration
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB.URL.CONNECTION:mongodb://mitocode:mitocode@localhost:27017/mitocode?authSource=admin}
+
+### Postgresql database configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show: true
+    properties:
+      hibernate:
+        format_sql: true
+#        dialect: org.hibernate.dialect.PostgreSQL81Dialect
+  datasource:
+    url: ${POSTGRESQL.URL.CONNECTION:jdbc:postgresql://localhost:5432/mitocode}
+    username: mitocode
+    password: mitocode
+
+  # security:
+  #   oauth2:
+  #     client:
+  #       provider:
+  #         external:
+  #           issuer-uri: http://localhost:8080/realms/external
+  #       registration:
+  #         external:
+  #           provider: external
+  #           client-name: external-client
+  #           client-id: external-client
+  #           client-secret: MtbhMWVBcUi7Xp31U6GEofDp7jS88B6X
+  #           scope: openid
+  #           authorization-grant-type: authorization_code
+
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: swagger-ui.html
+    enabled: true
+
+info:
+  app:
+    name: Producto Service Mitocode
+    description: Módulo de la arquitectura de Microservicios que disponibiliza la información de los productos
+    version: 0.0.1
+
+management:
+  endpoints:
+    info:
+      env:
+        enabled: true
+    web:
+      exposure:
+        # include: 'metrics, disk_space, mem, cpu, prometheus'
+        include: '*'
+        base-path: /actuator
+
+kafka:
+  mitocode:
+    topic: mitocode
+    server: 127.0.0.1
+    port: 9092

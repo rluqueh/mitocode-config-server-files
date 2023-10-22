@@ -1,0 +1,92 @@
+server:
+  port: ${CUSTOM.SERVER.PORT:9080}
+
+# Eureka Client Config
+eureka:
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+# Circuit Breaker configuration
+resilience4j:
+  circuitbreaker:
+    configs:
+      circuitBreakerProduct:
+        slidingWindowSize: 16
+        failureRateThreshold: 75
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 10
+        slowCallDurationThreshold: 200ms
+        slowCallRateThreshold: 50
+    instances:
+      product-cb:
+        base-config: circuitBreakerProduct
+  timelimiter:
+    configs:
+      timeLimiterProduct:
+        timeoutDuration: 1700
+    instances:
+      product-cb:
+        base-config: timeLimiterProduct
+
+# Cloud Gateway Routes
+spring:
+  cloud:
+    gateway:
+      routes: 
+
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/product-service/**
+          filters:
+            - StripPrefix=2
+            # - name: CircuitBreaker
+            #   args:
+            #     name: product-cb
+            #     statusCode: 400, 401, 403, 500, 503, 504
+            #     fallbackUri: forward:/api/user-service/user
+
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/user-service/**
+          filters:
+            - StripPrefix=2
+            # - CustomFilterMitocode=MitocodeKey, MitocodeValue
+
+            # - name: CustomFilter:
+            #   args:
+            #     headerKey: MitocodeKey
+            #     headerValue: MitocodeValue
+
+            # - AddRequestHeader=MitocodeKey, MitocodeValue
+            # - AddResponseHeader=MitocodeHeader, MitocodeHeaderValue
+            # - AddRequestParameter=role, ROLE_USER
+  # main:
+  #   web-application-type: 
+  #   allow-bean-definition-overriding: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/external
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+
+  # security:
+  #   user:
+  #     name: jchoy
+  #     password: jchoy
+  #     roles: ROLE_ADMIN
+
+mitocode:
+  security:
+    key: b5c6bc8697ca08fd98469ddce4d9ae9f45d433823364d8299221c0c7b376014c9a6998b0ddcac89b760731ec79a26ae4abe29116ecd3f188a2c0bbd340aa3bb5cde2754d4e56256ed05b470d5392814d699f7a13844cabfc6217fd67f444e6e3
+
+jwt:
+  auth:
+    converter:
+      resource-id: external-client
+      principal-attribute: preferred_username

@@ -1,0 +1,17 @@
+server:
+  port: ${CUSTOM.SERVER.PORT:9005}
+
+# Eureka Client Configuration
+eureka:
+  client:
+    fetchRegistry: false
+    registerWithEureka: false
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+user-service:
+  ribbon:
+    eureka:
+      enabled: false
+    listOfServers: localhost:9001, localhost:9011, localhost:9111
+    ServerListRefreshInterval: 1500
